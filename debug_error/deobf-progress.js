@@ -7,17 +7,18 @@ CALLBACK(function(ctx) { // _ = ctx (because this function is called through use
  Copyright The Closure Library Authors.
  SPDX-License-Identifier: Apache-2.0
 */
-var ma, oa, xa, Ba, Da, Ea, La, Sa;
-_.ja = function(a) {
+    // looks like this part is the same as in the auth module. Should probably split into a common module at some point
+var iter, defineProperty, findGlobalRoot, globalRoot, compute, iterableIterator, La, Sa;
+ctx.ja = function(a) {
     return function() {
-        return _.ea[a].apply(this, arguments)
+        return ctx.ea[a].apply(this, arguments)
     }
 };
 _._DumpException = function(a) {
     throw a;
 };
 _.ea = [];
-ma = function(a) {
+iter = function(a) {
     var b = 0;
     return function() {
         return b < a.length ? {
@@ -28,12 +29,12 @@ ma = function(a) {
         }
     }
 };
-oa = "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, b, c) {
+defineProperty = "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, b, c) {
     if (a == Array.prototype || a == Object.prototype) return a;
     a[b] = c.value;
     return a
 };
-xa = function(a) {
+findGlobalRoot = function(a) {
     a = ["object" == typeof globalThis && globalThis, a, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof global && global];
     for (var b = 0; b < a.length; ++b) {
         var c = a[b];
@@ -41,24 +42,25 @@ xa = function(a) {
     }
     throw Error("a");
 };
-Ba = xa(this);
-Da = function(a, b) {
-    if (b) a: {
-        var c = Ba;a = a.split(".");
+globalRoot = findGlobalRoot(this);
+compute = function(childName, gen) {
+    if (gen) genBlock: {
+        var c = globalRoot;
+        childName = childName.split(".");
         for (var d = 0; d < a.length - 1; d++) {
-            var e = a[d];
-            if (!(e in c)) break a;
+            var e = childName[d];
+            if (!(e in c)) break genBlock;
             c = c[e]
         }
-        a = a[a.length - 1];d = c[a];b = b(d);b != d && null != b && oa(c, a, {
+        childName = childName[childName.length - 1];d = c[childName];b = b(d);b != d && null != b && defineProperty(c, childName, {
             configurable: !0,
             writable: !0,
             value: b
         })
     }
 };
-Da("Symbol", function(a) {
-    if (a) return a;
+compute("Symbol", function(old) {
+    if (old) return old;
     var b = function(e, f) {
         this.pO = e;
         oa(this, "description", {
@@ -77,22 +79,22 @@ Da("Symbol", function(a) {
         };
     return d
 });
-Da("Symbol.iterator", function(a) {
-    if (a) return a;
-    a = Symbol("Symbol.iterator");
+compute("Symbol.iterator", function(old) {
+    if (old) return old;
+    var sym = Symbol("Symbol.iterator");
     for (var b = "Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array".split(" "), c = 0; c < b.length; c++) {
         var d = Ba[b[c]];
-        "function" === typeof d && "function" != typeof d.prototype[a] && oa(d.prototype, a, {
+        "function" === typeof d && "function" != typeof d.prototype[sym] && defineProperty(d.prototype, sym, {
             configurable: !0,
             writable: !0,
             value: function() {
-                return Ea(ma(this))
+                return iterableIterator(iter(this))
             }
         })
     }
-    return a
+    return sym
 });
-Ea = function(a) {
+iterableIterator = function(a) {
     a = {
         next: a
     };
