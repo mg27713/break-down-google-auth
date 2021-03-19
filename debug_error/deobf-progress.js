@@ -152,30 +152,30 @@ Da("String.prototype.startsWith", function(a) {
         return g >= f
     }
 });
-var Ta = function(a, b) {
-    a instanceof String && (a += "");
-    var c = 0,
-        d = !1,
-        e = {
+var transformedIterator = function(str, transform) { // Ta = transformedIterator
+    str instanceof String && (str += "");
+    var index = 0,
+        done = !1,
+        iter = {
             next: function() {
-                if (!d && c < a.length) {
-                    var f = c++;
+                if (!done && index < str.length) {
+                    var oldIndex = index++; // c++ :)
                     return {
-                        value: b(f, a[f]),
+                        value: transform(oldIndex, str[oldIndex]),
                         done: !1
                     }
                 }
-                d = !0;
+                done = !0;
                 return {
                     done: !0,
                     value: void 0
                 }
             }
         };
-    e[Symbol.iterator] = function() {
-        return e
+    iter[Symbol.iterator] = function() {
+        return iter
     };
-    return e
+    return iter
 };
 Da("Array.prototype.keys", function(a) {
     return a ? a : function() {
