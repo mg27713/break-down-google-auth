@@ -9,6 +9,9 @@ CALLBACK(function(ctx) { // _ = ctx (because this function is called through use
 */
     // looks like this part is the same as in the auth module. Should probably split into a common module at some point
 var iter, defineProperty, findGlobalRoot, globalRoot, compute, iterableIterator, setPrototypeOf, checkStringArgs;
+    
+    // Da = compute
+    
 ctx.ja = function(a) {
     return function() {
         return ctx.ea[a].apply(this, arguments)
@@ -43,7 +46,7 @@ findGlobalRoot = function(a) {
     throw Error("a");
 };
 globalRoot = findGlobalRoot(this);
-compute = function(childName, gen) {
+compute = function(childName, gen) { // Da = compute
     if (gen) genBlock: {
         var c = globalRoot;
         childName = childName.split(".");
@@ -141,15 +144,15 @@ checkStringArgs = function(ths, arg1, prop) { // Sa = checkStringArgs
     if (arg1 instanceof RegExp) throw new TypeError("First argument to String.prototype." + prop + " must not be a regular expression");
     return ths + ""
 };
-Da("String.prototype.startsWith", function(a) {
-    return a ? a : function(b, c) {
-        var d = Sa(this, b, "startsWith"),
-            e = d.length,
-            f = b.length;
-        c = Math.max(0, Math.min(c | 0, d.length));
-        for (var g = 0; g < f && c < e;)
-            if (d[c++] != b[g++]) return !1;
-        return g >= f
+compute("String.prototype.startsWith", function(old) {
+    return old ? old : function(searchVal, start) {
+        var str = checkStringArgs(this, searchVal, "startsWith"),
+            myLen = str.length,
+            startLen = searchVal.length;
+        start = Math.max(0, Math.min(start | 0, str.length));
+        for (var index = 0; index < startLen && start < myLen;)
+            if (str[start++] != searchVal[index++]) return !1;
+        return index >= startLen
     }
 });
 var transformedIterator = function(str, transform) { // Ta = transformedIterator
@@ -177,60 +180,60 @@ var transformedIterator = function(str, transform) { // Ta = transformedIterator
     };
     return iter
 };
-Da("Array.prototype.keys", function(a) {
-    return a ? a : function() {
-        return Ta(this, function(b) {
-            return b
+compute("Array.prototype.keys", function(old) {
+    return old ? old : function() {
+        return transformedIterator(this, function(index) {
+            return index
         })
     }
 });
-Da("Array.prototype.values", function(a) {
-    return a ? a : function() {
-        return Ta(this, function(b, c) {
-            return c
+compute("Array.prototype.values", function(old) {
+    return old ? old : function() {
+        return transformedIterator(this, function(index, val) {
+            return val
         })
     }
 });
-var Ua = function(a, b) {
-    return Object.prototype.hasOwnProperty.call(a, b)
+var hasOwnProperty = function(obj, prop) { // Ua = hasOwnProperty
+    return Object.prototype.hasOwnProperty.call(obj, prop)
 };
-Da("Object.values", function(a) {
-    return a ? a : function(b) {
-        var c = [],
-            d;
-        for (d in b) Ua(b, d) && c.push(b[d]);
-        return c
+compute("Object.values", function(old) {
+    return old ? old : function(obj) {
+        var values = [],
+            key;
+        for (key in obj) hasOwnProperty(obj, key) && values.push(obj[key]);
+        return values
     }
 });
-Da("Array.from", function(a) {
-    return a ? a : function(b, c, d) {
-        c = null != c ? c : function(k) {
-            return k
+compute("Array.from", function(old) {
+    return old ? old : function(arrayLike, map, ths) {
+        map = null != map ? map : function(val) {
+            return val
         };
-        var e = [],
-            f = "undefined" != typeof Symbol && Symbol.iterator && b[Symbol.iterator];
-        if ("function" == typeof f) {
-            b = f.call(b);
-            for (var g = 0; !(f = b.next()).done;) e.push(c.call(d, f.value, g++))
+        var out = [],
+            next = "undefined" != typeof Symbol && Symbol.iterator && arrayLike[Symbol.iterator];
+        if ("function" == typeof next) {
+            arrayLike = next.call(arrayLike);
+            for (var index = 0; !(next = arrayLike.next()).done;) out.push(map.call(ths, next.value, index++))
         } else
-            for (f = b.length, g = 0; g < f; g++) e.push(c.call(d, b[g], g));
-        return e
+            for (next = arrayLike.length, index = 0; index < next; index++) out.push(map.call(ths, arrayLike[index], index));
+        return out
     }
 });
-Da("Object.is", function(a) {
-    return a ? a : function(b, c) {
-        return b === c ? 0 !== b || 1 / b === 1 / c : b !== b && c !== c
+Da("Object.is", function(old) {
+    return old ? old : function(obj1, obj2) {
+        return obj1 === obj2 ? 0 !== obj1 || 1 / obj1 === 1 / obj2 : obj1 !== obj1 && obj2 !== obj2
     }
 });
-Da("Array.prototype.includes", function(a) {
-    return a ? a : function(b, c) {
-        var d = this;
-        d instanceof String && (d = String(d));
-        var e = d.length;
-        c = c || 0;
-        for (0 > c && (c = Math.max(c + e, 0)); c < e; c++) {
-            var f = d[c];
-            if (f === b || Object.is(f, b)) return !0
+Da("Array.prototype.includes", function(old) {
+    return old ? old : function(thing, start) {
+        var array = this;
+        array instanceof String && (array = String(d));
+        var len = array.length;
+        start = start || 0;
+        for (0 > start && (start = Math.max(start + len, 0)); start < len; start++) {
+            var element = array[start];
+            if (element === thing || Object.is(element, thing)) return !0
         }
         return !1
     }
