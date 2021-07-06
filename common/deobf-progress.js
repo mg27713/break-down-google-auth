@@ -7,7 +7,7 @@ CALLBACK(function(ctx) { // _ = ctx (because this function is called through use
  Copyright The Closure Library Authors.
  SPDX-License-Identifier: Apache-2.0
 */
-    // looks like this part is the same as in the auth module. Should probably split into a common module at some point
+    // looks like this part is the same as in the auth module. Should probably split into a common module at some point - now split into a common module!
 var iter, defineProperty, findGlobalRoot, globalRoot, compute, iterableIterator, setPrototypeOf, checkStringArgs;
     
     // Da = compute
@@ -97,7 +97,7 @@ compute("Symbol.iterator", function(old) {
     }
     return sym
 });
-iterableIterator = function(a) {
+iterableIterator = function(a) { // Ea = iterableIterator
     a = {
         next: a
     };
@@ -353,123 +353,125 @@ compute("WeakMap", function(OldWeakMap) {
         };
     return WeakMap
 });
-    // bookmark
-Da("Map", function(a) {
-    if (function() {
-            if (!a || "function" != typeof a || !a.prototype.entries || "function" != typeof Object.seal) return !1;
+
+Da("Map", function(OldMap) {
+    if (function() { // Test time, just like with WeakMap
+            if (!OldMap || "function" != typeof OldMap || !OldMap.prototype.entries || "function" != typeof Object.seal) return !1;
             try {
-                var k = Object.seal({
+                var testKey = Object.seal({
                         x: 4
                     }),
-                    l = new a(_.Ha([
-                        [k, "s"]
+                    testMap = new OldMap(ctx.symbolIterator([
+                        [testKey, "s"]
                     ]));
-                if ("s" != l.get(k) || 1 != l.size || l.get({
+                if ("s" != testMap.get(testKey) || 1 != testMap.size || testMap.get({
                         x: 4
-                    }) || l.set({
+                    }) || testMap.set({
                         x: 4
-                    }, "t") != l || 2 != l.size) return !1;
-                var m = l.entries(),
-                    n = m.next();
-                if (n.done || n.value[0] != k || "s" != n.value[1]) return !1;
-                n = m.next();
-                return n.done || 4 != n.value[0].x || "t" != n.value[1] || !m.next().done ? !1 : !0
-            } catch (p) {
+                    }, "t") != testMap || 2 != testMap.size) return !1;
+                var entries = testMap.entries(),
+                    entry = entries.next();
+                if (entry.done || entry.value[0] != testKey || "s" != entry.value[1]) return !1;
+                entry = entries.next();
+                return entry.done || 4 != entry.value[0].x || "t" != entry.value[1] || !entries.next().done ? !1 : !0
+            } catch (error) {
                 return !1
             }
-        }()) return a;
-    var b = new WeakMap,
-        c = function(k) {
-            this.yf = {};
+        }()) return OldMap;
+    var idKeys = new WeakMap,
+        Map = function(initialEntries) {
+            this.entryLists = {};
             this.Ze =
-                f();
+                emptyLinkedList();
             this.size = 0;
-            if (k) {
-                k = _.Ha(k);
-                for (var l; !(l = k.next()).done;) l = l.value, this.set(l[0], l[1])
+            if (initialEntries) {
+                initialEntries = ctx.symbolIterator(initialEntries);
+                for (var entry; !(entry = initialEntries.next()).done;) entry = entry.value, this.set(entry[0], entry[1])
             }
         };
-    c.prototype.set = function(k, l) {
-        k = 0 === k ? 0 : k;
-        var m = d(this, k);
-        m.list || (m.list = this.yf[m.id] = []);
-        m.we ? m.we.value = l : (m.we = {
+    Map.prototype.set = function(key, value) {
+        key = 0 === key ? 0 : key; // Not sure what the point of this is, but ok
+        var struct = entryStruct(this, key);
+        struct.list || (struct.list = this.entryLists[struct.id] = []);
+        struct.entry ? struct.entry.value = value : (struct.entry = {
             next: this.Ze,
             ej: this.Ze.ej,
             head: this.Ze,
-            key: k,
-            value: l
-        }, m.list.push(m.we), this.Ze.ej.next = m.we, this.Ze.ej = m.we, this.size++);
+            key: key,
+            value: value
+        }, struct.list.push(struct.entry), this.Ze.ej.next = struct.entry, this.Ze.ej = struct.entry, this.size++);
         return this
     };
-    c.prototype.delete = function(k) {
-        k = d(this, k);
-        return k.we && k.list ? (k.list.splice(k.index, 1), k.list.length || delete this.yf[k.id], k.we.ej.next = k.we.next, k.we.next.ej =
-            k.we.ej, k.we.head = null, this.size--, !0) : !1
+    Map.prototype.delete = function(key) {
+        struct = entryStruct(this, key);
+        return struct.entry && struct.list ? (struct.list.splice(struct.index, 1), struct.list.length || delete this.entryLists[struct.id], struct.we.ej.next = struct.we.next, struct.we.next.ej =
+            struct.we.ej, struct.we.head = null, this.size--, !0) : !1
     };
-    c.prototype.clear = function() {
-        this.yf = {};
-        this.Ze = this.Ze.ej = f();
+    Map.prototype.clear = function() {
+        this.entryLists = {};
+        this.Ze = this.Ze.ej = emptyLinkedList();
         this.size = 0
     };
-    c.prototype.has = function(k) {
-        return !!d(this, k).we
+    Map.prototype.has = function(key) {
+        return !!entryStruct(this, key).entry
     };
-    c.prototype.get = function(k) {
-        return (k = d(this, k).we) && k.value
+    Map.prototype.get = function(key) {
+        var entry; // added by me
+        return (entry = entryStruct(this, key).entry) && entry.value
     };
-    c.prototype.entries = function() {
+    Map.prototype.entries = function() {
         return e(this, function(k) {
             return [k.key, k.value]
         })
     };
-    c.prototype.keys = function() {
+    Map.prototype.keys = function() {
         return e(this, function(k) {
             return k.key
         })
     };
-    c.prototype.values = function() {
+    Map.prototype.values = function() {
         return e(this, function(k) {
             return k.value
         })
     };
-    c.prototype.forEach = function(k, l) {
+    Map.prototype.forEach = function(k, l) {
         for (var m = this.entries(),
                 n; !(n = m.next()).done;) n = n.value, k.call(l, n[1], n[0], this)
     };
-    c.prototype[Symbol.iterator] = c.prototype.entries;
-    var d = function(k, l) {
-            var m = l && typeof l;
-            "object" == m || "function" == m ? b.has(l) ? m = b.get(l) : (m = "" + ++g, b.set(l, m)) : m = "p_" + l;
-            var n = k.yf[m];
-            if (n && Ua(k.yf, m))
-                for (k = 0; k < n.length; k++) {
-                    var p = n[k];
-                    if (l !== l && p.key !== p.key || l === p.key) return {
-                        id: m,
-                        list: n,
-                        index: k,
-                        we: p
+    Map.prototype[Symbol.iterator] = c.prototype.entries;
+    var entryStruct = function(map, key) {
+            var type = key && typeof key;
+        var idKey; // added by me for simplicity
+            "object" == type || "function" == type ? idKeys.has(key) ? idKey = idKeys.get(key) : (idKey = "" + ++g, idKeys.set(key, idKey)) : idKey = "p_" + key;
+            var entry = map.entryLists[idKey];
+            if (entry && hasOwnProperty(map.entries, idKey)) // anti-collisions or something? this doesn't make any sense
+                for (index = 0; index < entry.length; index++) {
+                    var realEntry = entry[index];
+                    if (key !== key && realEntry.key !== realEntry.key || key === realEntry.key) return { // NaN checking for the first 2 cases
+                        id: idKey,
+                        list: entry,
+                        index: index,
+                        entry: realEntry
                     }
                 }
             return {
-                id: m,
-                list: n,
+                id: idKey,
+                list: entry,
                 index: -1,
-                we: void 0
+                entry: void 0
             }
         },
-        e = function(k, l) {
-            var m = k.Ze;
-            return Ea(function() {
-                if (m) {
-                    for (; m.head != k.Ze;) m = m.ej;
-                    for (; m.next != m.head;) return m =
-                        m.next, {
+        e = function(map, l) {
+            var list = map.Ze;
+            return iterableIterator(function() {
+                if (list) {
+                    for (; list.head != map.list;) list = list.ej;
+                    for (; list.next != list.head;) return list =
+                        list.next, {
                             done: !1,
-                            value: l(m)
+                            value: l(list)
                         };
-                    m = null
+                    list = null
                 }
                 return {
                     done: !0,
@@ -477,12 +479,12 @@ Da("Map", function(a) {
                 }
             })
         },
-        f = function() {
-            var k = {};
-            return k.ej = k.next = k.head = k
+        emptyLinkedList = function() {
+            var list = {};
+            return list.ej = list.next = list.head = list
         },
         g = 0;
-    return c
+    return Map
 });
 Da("Set", function(a) {
     if (function() {
