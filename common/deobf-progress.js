@@ -777,20 +777,20 @@ ctx.nb = Array.prototype.lastIndexOf ? function(array, elem) {
         if (index in array && array[index] === elem) return index;
     return -1
 };
-_.ob = Array.prototype.forEach ? function(a, b, c) {
-    Array.prototype.forEach.call(a, b, c)
-} : function(a, b, c) {
-    for (var d = a.length, e = "string" === typeof a ? a.split("") : a, f = 0; f < d; f++) f in e && b.call(c, e[f], f, a)
+ctx.forEach = Array.prototype.forEach ? function(array, callback, thisArg) { // ctx.ob = ctx.forEach
+    Array.prototype.forEach.call(array, callback, thisArg)
+} : function(array, callback, thisArg) {
+    for (var len = array.length, realArray = "string" === typeof array ? array.split("") : array, index = 0; index < len; index++) index in realArray && callback.call(thisArg, realArray[index], index, array)
 };
-_.pb = Array.prototype.filter ? function(a, b) {
-    return Array.prototype.filter.call(a, b, void 0)
-} : function(a, b) {
-    for (var c = a.length, d = [], e = 0, f = "string" === typeof a ? a.split("") : a, g = 0; g < c; g++)
-        if (g in f) {
-            var k = f[g];
-            b.call(void 0, k, g, a) && (d[e++] = k)
+ctx.filter = Array.prototype.filter ? function(array, callback) { // ctx.pb = ctx.filter
+    return Array.prototype.filter.call(array, callback, void 0)
+} : function(array, callback) {
+    for (var len = array.length, out = [], outIndex = 0, realArray = "string" === typeof array ? array.split("") : array, inIndex = 0; inIndex < len; inIndex++)
+        if (inIndex in realArray) {
+            var elem = realArray[inIndex];
+            callback.call(void 0, elem, inIndex, array) && (out[outIndex++] = elem)
         }
-    return d
+    return out
 };
 _.qb = Array.prototype.map ? function(a, b) {
     return Array.prototype.map.call(a, b, void 0)
