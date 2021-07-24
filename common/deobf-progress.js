@@ -486,68 +486,68 @@ compute("Map", function(OldMap) {
         g = 0;
     return Map
 });
-Da("Set", function(a) {
-    if (function() {
-            if (!a || "function" != typeof a || !a.prototype.entries || "function" != typeof Object.seal) return !1;
+compute("Set", function(OldSet) {
+    if (function() { // testing if the old one is good, like Map and WeakMap
+            if (!OldSet || "function" != typeof OldSet || !OldSet.prototype.entries || "function" != typeof Object.seal) return !1;
             try {
-                var c = Object.seal({
+                var testObj = Object.seal({
                         x: 4
                     }),
-                    d = new a(_.Ha([c]));
-                if (!d.has(c) || 1 != d.size || d.add(c) != d || 1 != d.size || d.add({
+                    testSet = new OldSet(ctx.Ha([c]));
+                if (!testSet.has(testObj) || 1 != testSet.size || testSet.add(testObj) != testSet || 1 != testSet.size || testSet.add({
                         x: 4
-                    }) != d || 2 != d.size) return !1;
-                var e = d.entries(),
-                    f = e.next();
-                if (f.done || f.value[0] != c || f.value[1] != c) return !1;
-                f = e.next();
-                return f.done || f.value[0] == c || 4 != f.value[0].x || f.value[1] != f.value[0] ? !1 : e.next().done
-            } catch (g) {
+                    }) != testSet || 2 != testSet.size) return !1;
+                var entries = testSet.entries(),
+                    current = entries.next();
+                if (current.done || current.value[0] != testObj || current.value[1] != testObj) return !1;
+                current = entries.next();
+                return current.done || current.value[0] == testObj || 4 != current.value[0].x || current.value[1] != current.value[0] ? !1 : entries.next().done
+            } catch (error) {
                 return !1
             }
-        }()) return a;
-    var b = function(c) {
-        this.Ha = new Map;
-        if (c) {
-            c =
-                _.Ha(c);
-            for (var d; !(d = c.next()).done;) this.add(d.value)
+        }()) return OldSet;
+    var Set = function(initial) { // b = Set
+        this.map = new Map;
+        if (initial) {
+            var iter =
+                ctx.symbolIterator(iter);
+            for (var elem; !(elem = iter.next()).done;) this.add(elem.value)
         }
-        this.size = this.Ha.size
+        this.size = this.map.size
     };
-    b.prototype.add = function(c) {
-        c = 0 === c ? 0 : c;
-        this.Ha.set(c, c);
-        this.size = this.Ha.size;
+    Set.prototype.add = function(thing) {
+        thing = 0 === thing ? 0 : thing; // another confusion line
+        this.map.set(thing, thing);
+        this.size = this.map.size;
         return this
     };
-    b.prototype.delete = function(c) {
-        c = this.Ha.delete(c);
-        this.size = this.Ha.size;
-        return c
+    Set.prototype.delete = function(thing) {
+        thing = this.map.delete(thing);
+        this.size = this.map.size;
+        return thing
     };
-    b.prototype.clear = function() {
-        this.Ha.clear();
+    Set.prototype.clear = function() {
+        this.map.clear();
         this.size = 0
     };
-    b.prototype.has = function(c) {
-        return this.Ha.has(c)
+    Set.prototype.has = function(thing) {
+        return this.map.has(thing)
     };
-    b.prototype.entries = function() {
-        return this.Ha.entries()
+    Set.prototype.entries = function() {
+        return this.map.entries()
     };
-    b.prototype.values = function() {
-        return this.Ha.values()
+    Set.prototype.values = function() {
+        return this.map.values()
     };
-    b.prototype.keys = b.prototype.values;
-    b.prototype[Symbol.iterator] = b.prototype.values;
-    b.prototype.forEach = function(c, d) {
-        var e = this;
-        this.Ha.forEach(function(f) {
-            return c.call(d, f, f, e)
+    Set.prototype.keys = Set.prototype.values;
+    Set.prototype[Symbol.iterator] = Set.prototype.values;
+    Set.prototype.forEach = function(c, thisArg) {
+        var self = this;
+        this.map.forEach(function(val) {
+            return c.call(thisArg, val, val, self)
         })
     };
-    return b
+    return Set // appears to just be a cover over the Map impl
 });
 _.q = {};
 _.Wa = _.Wa || {};
