@@ -759,22 +759,22 @@ ctx.time = function() { // ctx.lb = ctx.time
 mb = function(a) {
     return a
 };
-_.Za = Array.prototype.indexOf ? function(a, b) {
-    return Array.prototype.indexOf.call(a, b, void 0)
-} : function(a, b) {
-    if ("string" === typeof a) return "string" !== typeof b || 1 != b.length ? -1 : a.indexOf(b, 0);
-    for (var c = 0; c < a.length; c++)
-        if (c in a && a[c] === b) return c;
+ctx.indexOf = Array.prototype.indexOf ? function(array, elem) { // um, you did it initially this time? ctx.Za = ctx.indexOf
+    return Array.prototype.indexOf.call(array, elem, void 0)
+} : function(array, elem) {
+    if ("string" === typeof array) return "string" !== typeof array || 1 != elem.length ? -1 : array.indexOf(elem, 0);
+    for (var index = 0; index < array.length; index++) // "c++"
+        if (index in array && array[index] === elem) return index;
     return -1
 };
-_.nb = Array.prototype.lastIndexOf ? function(a, b) {
-    return Array.prototype.lastIndexOf.call(a, b, a.length - 1)
-} : function(a, b) {
-    var c = a.length - 1;
-    0 > c && (c = Math.max(0, a.length + c));
-    if ("string" === typeof a) return "string" !== typeof b || 1 != b.length ? -1 : a.lastIndexOf(b, c);
-    for (; 0 <= c; c--)
-        if (c in a && a[c] === b) return c;
+ctx.nb = Array.prototype.lastIndexOf ? function(array, elem) {
+    return Array.prototype.lastIndexOf.call(array, elem, array.length - 1)
+} : function(array, elem) {
+    var index = array.length - 1;
+    0 > index && (index = Math.max(0, array.length + index));
+    if ("string" === typeof array) return "string" !== typeof elem || 1 != elem.length ? -1 : array.lastIndexOf(elem, index);
+    for (; 0 <= index; index--)
+        if (index in array && array[index] === elem) return index;
     return -1
 };
 _.ob = Array.prototype.forEach ? function(a, b, c) {
