@@ -12,7 +12,8 @@ var iter, defineProperty, findGlobalRoot, globalRoot, compute, iterableIterator,
     
     // Da = compute
     
-ctx.ja = function(a) {
+    // This appears to be a mechanism where functions can be referenced before they are defined, by wrapping dummy functions around them.
+ctx.getFutureFunction = function(a) { // ctx.ja = ctx.getFutureFunction
     return function() {
         return ctx.ea[a].apply(this, arguments)
     }
@@ -20,7 +21,7 @@ ctx.ja = function(a) {
 ctx._DumpException = function(a) {
     throw a;
 };
-ctx.ea = [];
+ctx.futureFunctions = []; // ctx.ea = ctx.futureFunctions
 iter = function(a) { // ma = iter
     var b = 0;
     return function() {
@@ -909,7 +910,7 @@ ctx.Pb = function(a, b) { // class constructor
     this.gR = Ob
 };
 ctx.Pb.prototype.Ph = !0;
-ctx.Pb.prototype.xd = ctx.ja(4);
+ctx.Pb.prototype.xd = ctx.getFutureFunction(4);
 ctx.Qb = function(a) {
     return a instanceof ctx.Pb && a.constructor === ctx.Pb && a.gR === Ob ? a.EN : "type_error:Const"
 };
@@ -922,16 +923,16 @@ ctx.Ub = function(a, b) { // another class
     this.OL = b === ctx.Sb ? a : ""
 };
 ctx.Ub.prototype.Ph = !0; // Pb and Ub are probably different impls of the same thing
-ctx.Ub.prototype.xd = ctx.ja(3);
+ctx.Ub.prototype.xd = ctx.getFutureFunction(3);
 ctx.Ub.prototype.zB = !0;
-ctx.Ub.prototype.Hh = ctx.ja(6);
+ctx.Ub.prototype.Hh = ctx.getFutureFunction(6);
 ctx.Sb = {};
 ctx.Wb = new ctx.Ub("about:invalid#zClosurez", ctx.Sb); // arg1 of Ub is a URL
 ctx.Yb = function(a, b) { // yet another constructor
     this.NL = b === ctx.Xb ? a : ""
 };
 ctx.Yb.prototype.Ph = !0;
-ctx.Yb.prototype.xd = ctx.ja(2);
+ctx.Yb.prototype.xd = ctx.getFutureFunction(2);
 ctx.Xb = {};
 ctx.Zb = new ctx.Yb("", ctx.Xb);
 ctx.$b = {};
@@ -943,7 +944,7 @@ ctx.cc = function(a) {
     a = ctx.Qb(a); // gets a.EN
     return 0 === a.length ? bc : new ctx.ac(a, ctx.$b)
 };
-ctx.ac.prototype.xd = ctx.ja(1);
+ctx.ac.prototype.xd = ctx.getFutureFunction(1);
 var bc = new ctx.ac("", ctx.$b); // empty ac
 var dc; // yet another dummy object?
 ctx.ec = function(a, b, c) { // back to the lame constructors. a is a form of HTML.
@@ -951,9 +952,9 @@ ctx.ec = function(a, b, c) { // back to the lame constructors. a is a form of HT
     this.GS = b
 };
 ctx.ec.prototype.zB = !0;
-ctx.ec.prototype.Hh = ctx.ja(5);
+ctx.ec.prototype.Hh = ctx.getFutureFunction(5);
 ctx.ec.prototype.Ph = !0;
-ctx.ec.prototype.xd = ctx.ja(0);
+ctx.ec.prototype.xd = ctx.getFutureFunction(0);
 ctx.fc = function(a) { // seems to get the LL from an EC, which is HTML
     if (a instanceof ctx.ec && a.constructor === ctx.ec) return a.LL;
     ctx.getType(a); // what's the point of this?
@@ -1063,47 +1064,47 @@ ctx.ieVersion = ieVersion; // ctx.Qc = ctx.ieVersion
  SPDX-License-Identifier: Apache-2.0
 */
 var Yc, Zc, $c, bd, dd, fd, gd, hd, id, jd, kd, ld, nd, ud, vd, wd, xd, Fd, Gd;
-_.Uc = function(a, b) {
-    return _.ea[a] = b
+ctx.registerFutureFunction = function(id, handler) { // name TBD; need to see what usage looks like; done. ctx.Uc = ctx.registerFutureFunction
+    return ctx.futureFunctions[id] = handler
 };
-_.Vc = function(a) {
-    if (Error.captureStackTrace) Error.captureStackTrace(this, _.Vc);
+ctx.CustomError = function(message) { // ctx.Vc = ctx.CustomError (source: line 1124, subject to change)
+    if (Error.captureStackTrace) Error.captureStackTrace(this, ctx.CustomError);
     else {
-        var b = Error().stack;
-        b && (this.stack = b)
+        var stack = Error().stack;
+        stack && (this.stack = stack)
     }
-    a && (this.message = String(a))
+    message && (this.message = String(message))
 };
-_.Wc = function(a) {
+ctx.newArray = function(elem1) { // ctx.Wc = ctx.newArray
     return Array.prototype.concat.apply([], arguments)
 };
-_.Xc = function(a) {
-    var b = a.length;
-    if (0 < b) {
-        for (var c = Array(b), d = 0; d < b; d++) c[d] = a[d];
-        return c
+ctx.cloneArray = function(src) { // ctx.Xc = ctx.cloneArray
+    var len = src.length;
+    if (0 < len) {
+        for (var out = Array(len), index = 0; index < len; index++) out[index] = src[index];
+        return out
     }
     return []
 };
-_.Ub.prototype.Hh = _.Uc(6, function() {
+ctx.Ub.prototype.Hh = ctx.registerFutureFunction(6, function() {
     return 1
 });
-_.ec.prototype.Hh = _.Uc(5, function() {
+ctx.ec.prototype.Hh = ctx.registerFutureFunction(5, function() { // definitely different implementations of the same interface
     return this.GS
 });
-_.Pb.prototype.xd = _.Uc(4, function() {
+ctx.Pb.prototype.xd = ctx.registerFutureFunction(4, function() {
     return this.EN
 });
-_.Ub.prototype.xd = _.Uc(3, function() {
+ctx.Ub.prototype.xd = ctx.registerFutureFunction(3, function() {
     return this.OL.toString()
 });
-_.Yb.prototype.xd = _.Uc(2, function() {
+ctx.Yb.prototype.xd = ctx.registerFutureFunction(2, function() {
     return this.NL
 });
-_.ac.prototype.xd = _.Uc(1, function() {
+ctx.ac.prototype.xd = ctx.registerFutureFunction(1, function() {
     return this.ML
 });
-_.ec.prototype.xd = _.Uc(0, function() {
+ctx.ec.prototype.xd = ctx.registerFutureFunction(0, function() {
     return this.LL.toString()
 });
 Yc = null;
