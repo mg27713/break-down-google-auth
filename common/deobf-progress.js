@@ -903,7 +903,7 @@ ctx.getTrustedPolicy = function() { // ctx.Mb = ctx.getTrustedPolicy
     }
     return trustedPolicy
 };
-var Ob, Nb; // tables or something
+var Ob, Nb; // tables or something. Nope, they're just dummy objects
 ctx.Pb = function(a, b) { // class constructor
     this.EN = a === Nb && b || "";
     this.gR = Ob
@@ -1002,7 +1002,7 @@ ctx.pc = function(a, b) {
 ctx.computeIfAbsent = function(obj, key, func) { // ctx.qc = ctx.computeIfAbsent
     return Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : obj[key] = func(key)
 };
-var getDocumentMode, browserVersion, Oc, Sc;
+var getDocumentMode, browserVersion, versionCheckCache, ieVersion;
 ctx.isOpera = ctx.checkIsOpera(); // ctx.rc = ctx.isOpera
 ctx.isInternetExplorer = ctx.checkIsInternetExplorer(); // ctx.sc = ctx.isInternetExplorer
 ctx.isEdge = ctx.inUserAgent("Edge"); // ctx.tc = ctx.isEdge
@@ -1042,21 +1042,21 @@ findBrowserVersion: {
     }
     browserVersion = brVersion // Jc = browserVersion
 }
-_.Nc = Jc;
-Oc = {};
-_.Pc = function(a) {
-    return _.qc(Oc, a, function() {
-        return 0 <= _.wb(_.Nc, a)
+ctx.browserVersion = browserVersion; // ctx.Nc = ctx.browserVersion
+versionCheckCache = {}; // Oc = versionCheckCache
+ctx.checkVersion = function(minimum) { // ctx.Pc = ctx.checkVersion
+    return ctx.computeIfAbsent(versionCheckCache, minimum, function() {
+        return 0 <= ctx.wb(ctx.browserVersion, minimum)
     })
 };
-_.Rc = function(a) {
-    return Number(_.Qc) >= a
+ctx.checkIeVersion = function(minimum) { // ctx.Rc = ctx.checkIeVersion
+    return Number(ctx.ieVersion) >= minimum
 };
-if (_.A.document && _.sc) {
-    var Tc = Gc();
-    Sc = Tc ? Tc : parseInt(_.Nc, 10) || void 0
-} else Sc = void 0;
-_.Qc = Sc;
+if (ctx.self.document && ctx.isInternetExplorer) {
+    var documentMode = getDocumentMode();
+    ieVersion = documentMode ? documentMode : parseInt(ctx.browserVersion, 10) || void 0 // Sc = ieVersion
+} else ieVersion = void 0;
+ctx.ieVersion = ieVersion; // ctx.Qc = ctx.ieVersion
 
 /*
  Copyright The Closure Library Authors.
