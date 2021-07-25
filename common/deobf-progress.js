@@ -767,7 +767,7 @@ ctx.indexOf = Array.prototype.indexOf ? function(array, elem) { // um, you did i
         if (index in array && array[index] === elem) return index;
     return -1
 };
-ctx.nb = Array.prototype.lastIndexOf ? function(array, elem) {
+ctx.lastIndexOf = Array.prototype.lastIndexOf ? function(array, elem) { // ctx.nb = ctx.lastIndexOf
     return Array.prototype.lastIndexOf.call(array, elem, array.length - 1)
 } : function(array, elem) {
     var index = array.length - 1;
@@ -812,32 +812,32 @@ ctx.every = Array.prototype.every ? function(array, predicate, thisArg) { // ctx
         if (index in realArray && !predicate.call(thisArg, realArray[index], index, array)) return !1;
     return !0
 };
-var vb;
+var cmp;
 ctx.trim = String.prototype.trim ? function(str) { // ctx.tb = ctx.trim
     return str.trim()
 } : function(str) {
     return /^[\s\xa0]*([\s\S]*?)[\s\xa0]*$/.exec(str)[1]
 };
-_.wb = function(a, b) {
-    var c = 0;
-    a = (0, _.tb)(String(a)).split(".");
-    b = (0, _.tb)(String(b)).split(".");
-    for (var d = Math.max(a.length, b.length), e = 0; 0 == c && e < d; e++) {
-        var f = a[e] || "",
-            g = b[e] || "";
+ctx.strcmp = function(a, b) { // ctx.wb = strcmp
+    var res = 0; // seems like a strcmp-like thing?
+    a = (0, ctx.trim)(String(a)).split("."); // why is there a 0 expression there? We should really begin to question their sanity, considering that they've tried to reduce the size of this to the bare minimum.
+    b = (0, ctx.trim)(String(b)).split("."); // anyway, a and b must be stringlike
+    for (var len = Math.max(a.length, b.length), index = 0; 0 == res && index < len; index++) {
+        var part1 = a[index] || "",
+            part2 = b[index] || "";
         do {
-            f = /(\d*)(\D*)(.*)/.exec(f) || ["", "", "", ""];
-            g = /(\d*)(\D*)(.*)/.exec(g) || ["", "", "", ""];
-            if (0 == f[0].length && 0 == g[0].length) break;
-            c = vb(0 == f[1].length ? 0 : parseInt(f[1], 10), 0 == g[1].length ? 0 : parseInt(g[1], 10)) || vb(0 == f[2].length, 0 == g[2].length) || vb(f[2], g[2]);
-            f = f[3];
-            g = g[3]
-        } while (0 == c)
+            part1 = /(\d*)(\D*)(.*)/.exec(part1) || ["", "", "", ""]; // number-letter-any recursion, interesting
+            part2 = /(\d*)(\D*)(.*)/.exec(g) || ["", "", "", ""];
+            if (0 == part1[0].length && 0 == part2[0].length) break;
+            res = cmp(0 == part1[1].length ? 0 : parseInt(part1[1], 10), 0 == part2[1].length ? 0 : parseInt(part2[1], 10)) || cmp(0 == part1[2].length, 0 == part2[2].length) || cmp(part1[2], part2[2]);
+            part1 = part1[3];
+            part2 = part2[3]
+        } while (0 == res)
     }
-    return c
+    returnres
 };
-vb = function(a, b) {
-    return a < b ? -1 : a > b ? 1 : 0
+cmp = function(num1, num2) { // vb = cmp
+    return num1 < num2 ? -1 : num1 > num2 ? 1 : 0
 };
 a: {
     var yb = _.A.navigator;
