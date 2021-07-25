@@ -798,25 +798,25 @@ ctx.map = Array.prototype.map ? function(array, transform) { // ctx.qb = ctx.map
     for (var len = array.length, out = Array(len), realArray = "string" === typeof array ? array.split("") : array, index = 0; index < len; index++) index in realArray && (out[index] = transform.call(void 0, realArray[index], index, array));
     return out
 };
-ctx.rb = Array.prototype.some ? function(array, predicate, thisArg) {
+ctx.some = Array.prototype.some ? function(array, predicate, thisArg) { // ctx.rb = ctx.some
     return Array.prototype.some.call(array, predicate, thisArg)
 } : function(array, predicate, thisArg) {
     for (var len = array.length, realArray = "string" === typeof array ? array.split("") : array, index = 0; index < len; index++)
         if (index in realArray && predicate.call(thisArg, realArray[index], index, array)) return !0;
     return !1
 };
-_.sb = Array.prototype.every ? function(a, b, c) {
-    return Array.prototype.every.call(a, b, c)
-} : function(a, b, c) {
-    for (var d = a.length, e = "string" === typeof a ? a.split("") : a, f = 0; f < d; f++)
-        if (f in e && !b.call(c, e[f], f, a)) return !1;
+ctx.every = Array.prototype.every ? function(array, predicate, thisArg) { // ctx.sb = ctx.every
+    return Array.prototype.every.call(array, predicate, thisArg)
+} : function(array, predicate, thisArg) {
+    for (var len = array.length, realArray = "string" === typeof array ? array.split("") : array, index = 0; index < len; index++)
+        if (index in realArray && !predicate.call(thisArg, realArray[index], index, array)) return !1;
     return !0
 };
 var vb;
-_.tb = String.prototype.trim ? function(a) {
-    return a.trim()
-} : function(a) {
-    return /^[\s\xa0]*([\s\S]*?)[\s\xa0]*$/.exec(a)[1]
+ctx.trim = String.prototype.trim ? function(str) { // ctx.tb = ctx.trim
+    return str.trim()
+} : function(str) {
+    return /^[\s\xa0]*([\s\S]*?)[\s\xa0]*$/.exec(str)[1]
 };
 _.wb = function(a, b) {
     var c = 0;
