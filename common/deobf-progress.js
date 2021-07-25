@@ -722,7 +722,7 @@ _.bb = function(a) {
     var b = typeof a;
     return "object" == b && null != a || "function" == b
 };
-_.cb = function() {};
+ctx.pass = function() {}; // ctx.cb = ctx.pass
 ctx.getType = function(thing) { // ctx.eb = ctx.getType
     var type = typeof thing;
     return "object" != type ? type : thing ? Array.isArray(thing) ? "array" : type : "null"
@@ -865,16 +865,16 @@ ctx.mergeObjects = function(dst, src1) { // ctx.Fb = ctx.mergeObjects
         for (var defaultIndex = 0; defaultIndex < defaultProps.length; defaultIndex++) key = defaultProps[defaultIndex], Object.prototype.hasOwnProperty.call(src, key) && (dst[key] = src[key])
     }
 };
-ctx.Gb = function() { // ctx.Gb = ctx.isOpera
+ctx.checkIsOpera = function() { // ctx.Gb = ctx.checkIsOpera
     return ctx.inUserAgent("Opera")
 };
-ctx.isInternetExplorer = function() { // ctx.Hb = ctx.isInternetExplorer
+ctx.checkIsInternetExplorer = function() { // ctx.Hb = ctx.checkIsInternetExplorer
     return ctx.inUserAgent("Trident") || ctx.inUserAgent("MSIE")
 };
-ctx.isFirefox = function() { // ctx.Ib = ctx.isFirefox
+ctx.checkIsFirefox = function() { // ctx.Ib = ctx.checkIsFirefox
     return ctx.inUserAgent("Firefox") || ctx.inUserAgent("FxiOS")
 };
-ctx.isChrome = function() { // ctx.Jb = ctx.isChrome
+ctx.checkIsChrome = function() { // ctx.Jb = ctx.checkIsChrome
     return (ctx.inUserAgent("Chrome") || ctx.inUserAgent("CriOS")) && !ctx.inUserAgent("Edge")
 };
 ctx.singleUseFunction = function(func) { // ctx.Kb = ctx.singleUseFunction
@@ -982,42 +982,42 @@ ctx.repeat = String.prototype.repeat ? function(str, times) { // ctx.kc = ctx.re
     return Array(times + 1).join(str)
 };
 ctx.lc = 2147483648 * Math.random() | 0;
-ctx.isiPhone = function() { // ctx.mc = ctx.isiPhone
+ctx.checkIsiPhone = function() { // ctx.mc = ctx.checkIsiPhone
     return ctx.inUserAgent("iPhone") && !ctx.inUserAgent("iPod") && !ctx.inUserAgent("iPad")
 };
-ctx.isiOS = function() { // ctx.nc = ctx.isiOS (including iPadOS)
+ctx.checkIsiOS = function() { // ctx.nc = ctx.checkIsiOS (including iPadOS)
     return ctx.isiPhone() || ctx.inUserAgent("iPad") || ctx.inUserAgent("iPod") // very weird impl
 };
-var oc = function(a) {
-    oc[" "](a);
-    return a
+var oc = function(param) { // changable function?
+    oc[" "](param);
+    return param
 };
-oc[" "] = _.cb;
-_.pc = function(a, b) {
+oc[" "] = ctx.pass;
+ctx.pc = function(a, b) {
     try {
         return oc(a[b]), !0
     } catch (c) {}
     return !1
 };
-_.qc = function(a, b, c) {
-    return Object.prototype.hasOwnProperty.call(a, b) ? a[b] : a[b] = c(b)
+ctx.computeIfAbsent = function(obj, key, func) { // ctx.qc = ctx.computeIfAbsent
+    return Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : obj[key] = func(key)
 };
 var Gc, Jc, Oc, Sc;
-_.rc = _.Gb();
-_.sc = _.Hb();
-_.tc = _.Bb("Edge");
-_.uc = _.tc || _.sc;
-_.vc = _.Bb("Gecko") && !(-1 != _.xb.toLowerCase().indexOf("webkit") && !_.Bb("Edge")) && !(_.Bb("Trident") || _.Bb("MSIE")) && !_.Bb("Edge");
-_.wc = -1 != _.xb.toLowerCase().indexOf("webkit") && !_.Bb("Edge");
-_.xc = _.wc && _.Bb("Mobile");
-_.yc = _.Bb("Macintosh");
-_.zc = _.Bb("Windows");
-_.Ac = _.Bb("Linux") || _.Bb("CrOS");
-_.Bc = _.Bb("Android");
-_.Cc = _.mc();
-_.Dc = _.Bb("iPad");
-_.Ec = _.Bb("iPod");
-_.Fc = _.nc();
+ctx.isOpera = ctx.checkIsOpera(); // ctx.rc = ctx.isOpera
+ctx.isInternetExplorer = ctx.checkIsInternetExplorer(); // ctx.sc = ctx.isInternetExplorer
+ctx.isEdge = ctx.inUserAgent("Edge"); // ctx.tc = ctx.isEdge
+ctx.isMicrosoft = ctx.isEdge || ctx.isInternetExplorer; // ctx.uc = ctx.isMicrosoft
+ctx.isFirefox = ctx.inUserAgent("Gecko") && !(-1 != ctx.userAgent.toLowerCase().indexOf("webkit") && !ctx.inUserAgent("Edge")) && !(ctx.inUserAgent("Trident") || ctx.inUserAgent("MSIE")) && !ctx.inUserAgent("Edge"); // edge check earlier is useless; ctx.vc = ctx.isFirefox
+ctx.isWebKitLike = -1 != ctx.userAgent.toLowerCase().indexOf("webkit") && !ctx.inUserAgent("Edge"); // ctx.wc = ctx.isWebKitLike
+ctx.isiOSSafariBased = ctx.isWebKitLike && ctx.inUserAgent("Mobile"); // ctx.xc = ctx.isiOSSafariBased
+ctx.isMac = ctx.inUserAgent("Macintosh"); // ctx.yc = ctx.isMac
+ctx.isWindows = ctx.inUserAgent("Windows"); // ctx.zc = ctx.isWindows
+ctx.isLinux = ctx.inUserAgent("Linux") || ctx.inUserAgent("CrOS"); // ctx.Ac = ctx.isLinux
+ctx.isAndroid = ctx.inUserAgent("Android"); // ctx.Bc = ctx.isAndroid
+ctx.isiPhone = ctx.checkIsiPhone(); // ctx.Cc = ctx.isiPhone
+ctx.isiPad = ctx.inUserAgent("iPad"); // ctx.Dc = ctx.isiPad
+ctx.isiPod = ctx.inUserAgent("iPod"); // ctx.Ec = ctx.isiPod
+ctx.isiOS = ctx.checkIsiOS(); // ctx.Fc = ctx.isiOS
 Gc = function() {
     var a = _.A.document;
     return a ? a.documentMode : void 0
